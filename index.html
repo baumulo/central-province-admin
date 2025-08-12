@@ -1,298 +1,803 @@
-import React, { useState } from 'react';
-import { Plus, Bell, User, Home, Search, Send, Calendar, MapPin, Users, FileText, MessageCircle } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Province Administration Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const ProvinceAdminApp = () => {
-  const [activeTab, setActiveTab] = useState('home');
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      author: 'Provincial Permanent Secretary',
-      title: 'Monthly Coordination Meeting',
-      content: 'All district commissioners are required to attend the monthly coordination meeting on Friday, 15th at 09:00 hours at the Provincial Administration Office.',
-      timestamp: '2 hours ago',
-      priority: 'high',
-      category: 'Meeting',
-      location: 'Kabwe'
-    },
-    {
-      id: 2,
-      author: 'Provincial Planning Officer',
-      title: 'Budget Review Workshop',
-      content: 'Budget review workshop for Q3 implementation scheduled for next week. Please prepare your departmental reports.',
-      timestamp: '5 hours ago',
-      priority: 'medium',
-      category: 'Workshop',
-      location: 'Kabwe'
-    },
-    {
-      id: 3,
-      author: 'Provincial Health Director',
-      title: 'Health Sector Update',
-      content: 'Latest health sector statistics and vaccination campaign progress report now available for review.',
-      timestamp: '1 day ago',
-      priority: 'medium',
-      category: 'Report',
-      location: 'Central Province'
-    }
-  ]);
-  
-  const [newPost, setNewPost] = useState({ title: '', content: '', category: 'General', priority: 'medium' });
-  const [showNewPost, setShowNewPost] = useState(false);
-  
-  const handleAddPost = () => {
-    if (newPost.title && newPost.content) {
-      const post = {
-        id: posts.length + 1,
-        author: 'Current User',
-        title: newPost.title,
-        content: newPost.content,
-        timestamp: 'Just now',
-        priority: newPost.priority,
-        category: newPost.category,
-        location: 'Kabwe'
-      };
-      setPosts([post, ...posts]);
-      setNewPost({ title: '', content: '', category: 'General', priority: 'medium' });
-      setShowNewPost(false);
-    }
-  };
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
 
-  const getPriorityColor = (priority) => {
-    switch(priority) {
-      case 'high': return 'border-l-red-500 bg-red-50';
-      case 'medium': return 'border-l-yellow-500 bg-yellow-50';
-      case 'low': return 'border-l-green-500 bg-green-50';
-      default: return 'border-l-gray-500 bg-gray-50';
-    }
-  };
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-  const categories = ['General', 'Meeting', 'Workshop', 'Report', 'Announcement', 'Emergency'];
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
 
-  const renderHome = () => (
-    <div className="pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-b-lg mb-4">
-        <h2 className="text-lg font-semibold">Central Province Administration</h2>
-        <p className="text-blue-100 text-sm">Official Information Hub</p>
-        <div className="flex items-center mt-2 text-sm">
-          <MapPin size={14} className="mr-1" />
-          <span>Kabwe, Central Province</span>
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #2a5298;
+            border-bottom-color: #2a5298;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(42, 82, 152, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: #27ae60;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .dashboard {
+            display: none;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 30px 20px;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: #2a5298;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #2a5298;
+            color: white;
+        }
+
+        .main-content {
+            padding: 30px;
+            flex: 1;
+        }
+
+        .notice-card, .document-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .notice-meta, .document-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .verification-code {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2a5298;
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-verified {
+            background: #27ae60;
+        }
+
+        .status-pending {
+            background: #f39c12;
+        }
+
+        .file-upload {
+            border: 2px dashed #2a5298;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-upload:hover {
+            background: #f0f7ff;
+        }
+
+        .user-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Central Province Administration</h1>
+            <p>Secure Communication Portal for Heads of Departments</p>
         </div>
-      </div>
 
-      <div className="px-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Recent Updates</h3>
-          <button 
-            onClick={() => setShowNewPost(true)}
-            className="bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          {posts.map(post => (
-            <div key={post.id} className={`border-l-4 p-4 rounded-r-lg shadow-sm ${getPriorityColor(post.priority)}`}>
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-800 text-sm">{post.title}</h4>
-                  <p className="text-xs text-gray-600 mt-1">{post.author}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs text-gray-500">{post.timestamp}</span>
-                  <div className="flex items-center mt-1">
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{post.category}</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{post.content}</p>
-              <div className="flex items-center mt-3 text-xs text-gray-500">
-                <MapPin size={12} className="mr-1" />
-                <span>{post.location}</span>
-                <span className="mx-2">�</span>
-                <span className="capitalize">{post.priority} priority</span>
-              </div>
+        <!-- Authentication Section -->
+        <div id="authSection" class="auth-container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('login')">Login</button>
+                <button class="tab" onclick="showTab('register')">Register</button>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
 
-  const renderNotifications = () => (
-    <div className="pb-20 px-4">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Notifications</h2>
-      <div className="space-y-3">
-        {[
-          { title: 'New meeting scheduled', time: '10 min ago', read: false },
-          { title: 'Budget report uploaded', time: '1 hour ago', read: false },
-          { title: 'Weekly summary available', time: '2 hours ago', read: true },
-          { title: 'Emergency protocol updated', time: '1 day ago', read: true },
-        ].map((notif, index) => (
-          <div key={index} className={`p-4 rounded-lg border ${notif.read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                {!notif.read && <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>}
-                <div>
-                  <p className="font-medium text-gray-800 text-sm">{notif.title}</p>
-                  <p className="text-xs text-gray-500">{notif.time}</p>
-                </div>
-              </div>
+            <!-- Login Form -->
+            <div id="loginTab">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Official Email (@grz.gov.zm)</label>
+                        <input type="email" id="loginEmail" required pattern=".*@grz\.gov\.zm$">
+                        <div class="error" id="loginEmailError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
             </div>
-          </div>
-        ))}
-      </div>
+
+            <!-- Registration Form -->
+            <div id="registerTab" class="hidden">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Official Email (@grz.gov.zm)</label>
+                        <input type="email" id="registerEmail" required pattern=".*@grz\.gov\.zm$">
+                        <div class="error" id="registerEmailError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="department" required>
+                            <option value="">Select Department</option>
+                            <option value="health">Ministry of Health</option>
+                            <option value="education">Ministry of Education</option>
+                            <option value="agriculture">Ministry of Agriculture</option>
+                            <option value="infrastructure">Ministry of Infrastructure</option>
+                            <option value="finance">Ministry of Finance</option>
+                            <option value="local-govt">Ministry of Local Government</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Position/Title</label>
+                        <input type="text" id="position" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Phone (for 2FA)</label>
+                        <input type="tel" id="phone" required pattern="\+260[0-9]{9}">
+                        <small>Format: +260XXXXXXXXX</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPassword" required>
+                        <div class="error" id="passwordError"></div>
+                    </div>
+                    <button type="submit" class="btn">Register</button>
+                </form>
+            </div>
+
+            <!-- 2FA Verification -->
+            <div id="twoFASection" class="hidden">
+                <h3>Two-Factor Authentication</h3>
+                <p>We've sent a verification code to your mobile phone.</p>
+                <div class="verification-code" id="displayCode">123456</div>
+                <form id="twoFAForm">
+                    <div class="form-group">
+                        <label>Enter Verification Code</label>
+                        <input type="text" id="verificationCode" required pattern="[0-9]{6}" maxlength="6">
+                    </div>
+                    <button type="submit" class="btn">Verify</button>
+                    <button type="button" class="btn" onclick="resendCode()" style="background: #6c757d; margin-left: 10px;">Resend Code</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="sidebar">
+                <div class="user-info" id="userInfo">
+                    <strong id="userName"></strong><br>
+                    <small id="userEmail"></small><br>
+                    <span class="status-indicator status-verified"></span>Verified
+                </div>
+                <h3>Navigation</h3>
+                <div class="nav-item active" onclick="showSection('notices')">📢 Notices</div>
+                <div class="nav-item" onclick="showSection('documents')">📄 Documents</div>
+                <div class="nav-item" onclick="showSection('compose')">✍️ Compose</div>
+                <div class="nav-item" onclick="showSection('settings')">⚙️ Settings</div>
+                <div class="nav-item" onclick="logout()" style="color: #e74c3c;">🚪 Logout</div>
+            </div>
+
+            <div class="main-content">
+                <!-- Notices Section -->
+                <div id="noticesSection">
+                    <h2>Recent Notices & Communications</h2>
+                    <div id="noticesList">
+                        <!-- Sample notices will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div id="documentsSection" class="hidden">
+                    <h2>Official Documents</h2>
+                    <div id="documentsList">
+                        <!-- Documents will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Compose Section -->
+                <div id="composeSection" class="hidden">
+                    <h2>Compose Notice/Communication</h2>
+                    <form id="composeForm">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="noticeType" required>
+                                <option value="notice">Official Notice</option>
+                                <option value="memo">Memorandum</option>
+                                <option value="directive">Directive</option>
+                                <option value="announcement">Announcement</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select id="priority" required>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Recipients</label>
+                            <select id="recipients" multiple>
+                                <option value="all">All Departments</option>
+                                <option value="health">Ministry of Health</option>
+                                <option value="education">Ministry of Education</option>
+                                <option value="agriculture">Ministry of Agriculture</option>
+                                <option value="infrastructure">Ministry of Infrastructure</option>
+                                <option value="finance">Ministry of Finance</option>
+                                <option value="local-govt">Ministry of Local Government</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" id="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea id="message" rows="8" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Attachments</label>
+                            <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                                <input type="file" id="fileInput" multiple style="display: none;" accept=".pdf,.doc,.docx,.xlsx,.ppt,.pptx">
+                                <p>Click to upload files or drag and drop</p>
+                                <small>Supported: PDF, DOC, DOCX, XLSX, PPT, PPTX</small>
+                            </div>
+                            <div id="fileList"></div>
+                        </div>
+                        <button type="submit" class="btn">Send Communication</button>
+                    </form>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settingsSection" class="hidden">
+                    <h2>Account Settings</h2>
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label>Notification Preferences</label>
+                            <div style="margin-top: 10px;">
+                                <label><input type="checkbox" id="emailNotif" checked> Email notifications</label><br>
+                                <label><input type="checkbox" id="smsNotif" checked> SMS notifications</label><br>
+                                <label><input type="checkbox" id="urgentOnly"> Urgent messages only</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Update Phone Number</label>
+                            <input type="tel" id="newPhone" pattern="\+260[0-9]{9}">
+                        </div>
+                        <div class="form-group">
+                            <label>Change Password</label>
+                            <input type="password" id="newPassword" placeholder="New password">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmNewPassword" placeholder="Confirm new password">
+                        </div>
+                        <button type="submit" class="btn">Update Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  );
 
-  const renderProfile = () => (
-    <div className="pb-20 px-4">
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-        <div className="flex items-center mb-4">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-            <User size={24} className="text-white" />
-          </div>
-          <div className="ml-4">
-            <h3 className="font-semibold text-gray-800">Senior Officer</h3>
-            <p className="text-gray-600 text-sm">Central Province Administration</p>
-            <p className="text-gray-500 text-xs">Kabwe, Zambia</p>
-          </div>
-        </div>
-      </div>
+    <script>
+        // Application state
+        let currentUser = null;
+        let notices = [];
+        let documents = [];
+        let currentSection = 'notices';
 
-      <div className="space-y-4">
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h4 className="font-semibold text-gray-800 mb-2">Department</h4>
-          <p className="text-gray-600 text-sm">Provincial Administration</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h4 className="font-semibold text-gray-800 mb-2">Contact Information</h4>
-          <p className="text-gray-600 text-sm">Office: +260-XXX-XXXX</p>
-          <p className="text-gray-600 text-sm">Email: officer@centralz.gov.zm</p>
-        </div>
-      </div>
-    </div>
-  );
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSampleData();
+            setupEventListeners();
+        });
 
-  if (showNewPost) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
-          <button 
-            onClick={() => setShowNewPost(false)}
-            className="text-blue-600 font-medium"
-          >
-            Cancel
-          </button>
-          <h2 className="font-semibold text-gray-800">New Post</h2>
-          <button 
-            onClick={handleAddPost}
-            className="text-blue-600 font-medium"
-          >
-            Post
-          </button>
-        </div>
+        function setupEventListeners() {
+            // Form submissions
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('twoFAForm').addEventListener('submit', handle2FA);
+            document.getElementById('composeForm').addEventListener('submit', handleCompose);
+            document.getElementById('settingsForm').addEventListener('submit', handleSettings);
+            
+            // File upload
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+            
+            // Password confirmation validation
+            document.getElementById('confirmPassword').addEventListener('input', validatePasswords);
+        }
 
-        <div className="p-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-            <input
-              type="text"
-              value={newPost.title}
-              onChange={(e) => setNewPost({...newPost, title: e.target.value})}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter post title..."
-            />
-          </div>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('[id$="Tab"]').forEach(content => content.classList.add('hidden'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+        }
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-            <select
-              value={newPost.category}
-              onChange={(e) => setNewPost({...newPost, category: e.target.value})}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
+        function validateEmail(email) {
+            return email.endsWith('@grz.gov.zm');
+        }
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-            <select
-              value={newPost.priority}
-              onChange={(e) => setNewPost({...newPost, priority: e.target.value})}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="low">Low Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="high">High Priority</option>
-            </select>
-          </div>
+        function validatePasswords() {
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('passwordError');
+            
+            if (password !== confirmPassword && confirmPassword !== '') {
+                errorDiv.textContent = 'Passwords do not match';
+                return false;
+            } else {
+                errorDiv.textContent = '';
+                return true;
+            }
+        }
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-            <textarea
-              value={newPost.content}
-              onChange={(e) => setNewPost({...newPost, content: e.target.value})}
-              rows="6"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="Enter your message..."
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate email
+            if (!validateEmail(email)) {
+                document.getElementById('registerEmailError').textContent = 'Email must be from @grz.gov.zm domain';
+                return;
+            }
+            
+            // Validate passwords
+            if (!validatePasswords() || password !== confirmPassword) {
+                return;
+            }
+            
+            // Simulate registration
+            const userData = {
+                name: document.getElementById('fullName').value,
+                email: email,
+                department: document.getElementById('department').value,
+                position: document.getElementById('position').value,
+                phone: document.getElementById('phone').value
+            };
+            
+            // Store user data (in real app, this would be sent to server)
+            localStorage.setItem('pendingUser', JSON.stringify(userData));
+            
+            // Show 2FA verification
+            show2FA();
+        }
 
-  return (
-    <div className="min-h-screen bg-gray-50 max-w-md mx-auto relative">
-      {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <h1 className="font-bold text-gray-800">Admin Hub</h1>
-        <div className="flex items-center space-x-3">
-          <Search size={20} className="text-gray-600" />
-          <div className="relative">
-            <Bell size={20} className="text-gray-600" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-          </div>
-        </div>
-      </div>
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            
+            if (!validateEmail(email)) {
+                document.getElementById('loginEmailError').textContent = 'Email must be from @grz.gov.zm domain';
+                return;
+            }
+            
+            // Simulate login (in real app, verify credentials with server)
+            const userData = {
+                name: 'John Doe',
+                email: email,
+                department: 'Ministry of Health',
+                position: 'Head of Department'
+            };
+            
+            localStorage.setItem('pendingUser', JSON.stringify(userData));
+            show2FA();
+        }
 
-      {/* Content */}
-      <div className="flex-1">
-        {activeTab === 'home' && renderHome()}
-        {activeTab === 'notifications' && renderNotifications()}
-        {activeTab === 'profile' && renderProfile()}
-      </div>
+        function show2FA() {
+            document.getElementById('authSection').innerHTML = document.getElementById('twoFASection').innerHTML;
+            document.getElementById('twoFASection').classList.remove('hidden');
+            
+            // Generate random 6-digit code (in real app, this would be sent via SMS)
+            const code = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('displayCode').textContent = code;
+            localStorage.setItem('verificationCode', code);
+        }
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t">
-        <div className="flex justify-around py-2">
-          {[
-            { key: 'home', icon: Home, label: 'Home' },
-            { key: 'notifications', icon: Bell, label: 'Notifications' },
-            { key: 'profile', icon: User, label: 'Profile' },
-          ].map(({ key, icon: Icon, label }) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`flex flex-col items-center py-2 px-4 ${
-                activeTab === key ? 'text-blue-600' : 'text-gray-500'
-              }`}
-            >
-              <Icon size={20} />
-              <span className="text-xs mt-1">{label}</span>
-              {key === 'notifications' && (
-                <div className="absolute top-1 right-1/3 w-2 h-2 bg-red-500 rounded-full"></div>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+        function handle2FA(e) {
+            e.preventDefault();
+            
+            const enteredCode = document.getElementById('verificationCode').value;
+            const actualCode = localStorage.getItem('verificationCode');
+            
+            if (enteredCode === actualCode) {
+                // Login successful
+                const userData = JSON.parse(localStorage.getItem('pendingUser'));
+                currentUser = userData;
+                showDashboard();
+            } else {
+                alert('Invalid verification code. Please try again.');
+            }
+        }
 
-export default ProvinceAdminApp;
+        function resendCode() {
+            const code = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('displayCode').textContent = code;
+            localStorage.setItem('verificationCode', code);
+            alert('New verification code sent!');
+        }
+
+        function showDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'grid';
+            
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            
+            loadNotices();
+            loadDocuments();
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('[id$="Section"]').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            event.target.classList.add('active');
+            currentSection = section;
+        }
+
+        function loadSampleData() {
+            notices = [
+                {
+                    id: 1,
+                    type: 'urgent',
+                    subject: 'Emergency Health Protocol Update',
+                    message: 'All departments must implement new health screening procedures effective immediately.',
+                    sender: 'Ministry of Health',
+                    date: new Date('2025-08-10'),
+                    recipients: ['all']
+                },
+                {
+                    id: 2,
+                    type: 'notice',
+                    subject: 'Budget Review Meeting',
+                    message: 'Quarterly budget review meeting scheduled for August 20th at 10:00 AM.',
+                    sender: 'Ministry of Finance',
+                    date: new Date('2025-08-08'),
+                    recipients: ['all']
+                }
+            ];
+            
+            documents = [
+                {
+                    id: 1,
+                    title: 'Central Province Development Plan 2025',
+                    type: 'PDF',
+                    size: '2.5 MB',
+                    uploadDate: new Date('2025-08-05'),
+                    category: 'Policy'
+                },
+                {
+                    id: 2,
+                    title: 'Q2 Financial Report',
+                    type: 'XLSX',
+                    size: '1.8 MB',
+                    uploadDate: new Date('2025-08-01'),
+                    category: 'Finance'
+                }
+            ];
+        }
+
+        function loadNotices() {
+            const container = document.getElementById('noticesList');
+            container.innerHTML = '';
+            
+            notices.forEach(notice => {
+                const noticeCard = document.createElement('div');
+                noticeCard.className = 'notice-card';
+                noticeCard.innerHTML = `
+                    <div class="notice-meta">
+                        <span style="background: ${notice.type === 'urgent' ? '#e74c3c' : '#2a5298'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${notice.type.toUpperCase()}</span>
+                        <span style="float: right;">${notice.date.toLocaleDateString()}</span>
+                    </div>
+                    <h4>${notice.subject}</h4>
+                    <p>${notice.message}</p>
+                    <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                        From: ${notice.sender}
+                    </div>
+                `;
+                container.appendChild(noticeCard);
+            });
+        }
+
+        function loadDocuments() {
+            const container = document.getElementById('documentsList');
+            container.innerHTML = '';
+            
+            documents.forEach(doc => {
+                const docCard = document.createElement('div');
+                docCard.className = 'document-card';
+                docCard.innerHTML = `
+                    <div class="document-meta">
+                        <span style="background: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${doc.type}</span>
+                        <span style="float: right;">${doc.uploadDate.toLocaleDateString()}</span>
+                    </div>
+                    <h4>📄 ${doc.title}</h4>
+                    <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                        Category: ${doc.category} | Size: ${doc.size}
+                    </div>
+                    <button class="btn" style="margin-top: 10px; font-size: 0.9rem; padding: 8px 15px;">Download</button>
+                `;
+                container.appendChild(docCard);
+            });
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            Array.from(files).forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.style.cssText = 'background: #f0f7ff; padding: 10px; margin: 5px 0; border-radius: 5px;';
+                fileItem.innerHTML = `📎 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function handleCompose(e) {
+            e.preventDefault();
+            
+            const formData = {
+                type: document.getElementById('noticeType').value,
+                priority: document.getElementById('priority').value,
+                recipients: Array.from(document.getElementById('recipients').selectedOptions).map(o => o.value),
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                files: document.getElementById('fileInput').files
+            };
+            
+            // In real app, this would be sent to server
+            alert('Communication sent successfully!');
+            
+            // Add to notices list
+            notices.unshift({
+                id: notices.length + 1,
+                type: formData.priority,
+                subject: formData.subject,
+                message: formData.message,
+                sender: currentUser.department,
+                date: new Date(),
+                recipients: formData.recipients
+            });
+            
+            // Reset form
+            document.getElementById('composeForm').reset();
+            document.getElementById('fileList').innerHTML = '';
+            
+            // Refresh notices if currently viewing
+            if (currentSection === 'notices') {
+                loadNotices();
+            }
+        }
+
+        function handleSettings(e) {
+            e.preventDefault();
+            alert('Settings updated successfully!');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                localStorage.removeItem('pendingUser');
+                localStorage.removeItem('verificationCode');
+                document.getElementById('authSection').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
+                
+                // Reset forms
+                document.querySelectorAll('form').forEach(form => form.reset());
+            }
+        }
+
+        // Security: Auto-logout after inactivity
+        let inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                if (currentUser) {
+                    alert('Session expired due to inactivity. Please login again.');
+                    logout();
+                }
+            }, 30 * 60 * 1000); // 30 minutes
+        }
+
+        // Reset timer on user activity
+        document.addEventListener('mousedown', resetInactivityTimer);
+        document.addEventListener('mousemove', resetInactivityTimer);
+        document.addEventListener('keypress', resetInactivityTimer);
+        document.addEventListener('scroll', resetInactivityTimer);
+        document.addEventListener('touchstart', resetInactivityTimer);
+    </script>
+</body>
+</html>
